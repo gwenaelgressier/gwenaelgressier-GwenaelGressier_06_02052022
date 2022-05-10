@@ -1,7 +1,13 @@
 const mongoose = require("mongoose");
-const paswords = "3zxRc48PmAjWQBJx";
-
-const uri = `mongodb+srv://gwen:${paswords}@cluster0.odhgv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const paswords = process.env.DB_PASSWORDS; //se conecter à la base de données avec la variable d'environnement
+const userName = process.env.DB_USERNAME;
+const db = process.env.DB_NAME;
+let uri;
+if (process.env.NODE_ENV === "production") {
+  uri = "http://la_vraie_url_de_mongo";
+} else {
+  uri = `mongodb+srv://${userName}:${paswords}@cluster0.odhgv.mongodb.net/${db}?retryWrites=true&w=majority`;
+}
 
 mongoose
   .connect(uri)
