@@ -7,13 +7,14 @@ const port = 3000;
 //conection to database
 require("./mongo.js");
 //controller
-const { createUser } = require("./controllers/users.js");
+const { createUser, logUser } = require("./controllers/users.js");
 //Middleware
 app.use(cors()); //Le CORS permet de prendre en charge des requêtes multi-origines sécurisées et des transferts de données entre le navigateurs et le serveurs web
 app.use(express.json()); //Permet de parser les requêtes en JSON
 
 //Routes
 app.post("/api/auth/signup", createUser);
+app.post("/api/auth/login", logUser);
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
