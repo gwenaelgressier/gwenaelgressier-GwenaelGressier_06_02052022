@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -16,10 +17,10 @@ app.use(express.json()); //Permet de parser les requêtes en JSON
 app.post("/api/auth/signup", createUser);
 app.post("/api/auth/login", logUser);
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+    res.send("Hello World!");
 });
 
 //listen
 app.listen(port, () => {
-  console.log(`listening on port ${port}`);
+    console.log(`listening on port ${port}`);
 });
