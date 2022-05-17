@@ -1,26 +1,49 @@
 //mes require
 const { handle } = require("express/lib/router");
-const jwt = require("jsonwebtoken");
-//functions pour recuperer le token
+const mongoose = require("mongoose");
+
+const producSchema = new mongoose.Schema({
+    userId: String,
+    name: String,
+    manufacturer: String,
+    description: String,
+    mainPepper: String,
+    imageUrl: String,
+    heat: Number,
+    likes: Number,
+    dislikes: Number,
+    userLiked: [String],
+    userDisliked: [String],
+});
+
+const Product = mongoose.model("product", producSchema);
+
 function getSauces(req, res) {
-    const header = req.header("Authorization");
-    if (header == null)
-        return res.status(403).send({ message: "Vous n'êtes pas connecté" });
-
-    const token = header.split(" ")[1];
-    if (token == null) return res.status(403).send({ message: "token null" });
-
-    jwt.verify(token, process.env.JWT_PASSWORD, (err, decoded) =>
-        handleToken(err, decoded, res)
-    );
+    console.log("test");
+    Product.find({}).then((products) => res.send(products));
+}
+//creation de la sauce
+function createSauce(req, res) {
+    const name = req.body.name;
+    const manufacturer = req.body.manufacturer;
+    console.log({ body: req.body });
+    const product = new Product({
+        userId: "test",
+        name: "test",
+        manufacturer: "test",
+        description: "test",
+        mainPepper: "test",
+        imageUrl: "test",
+        heat: 2,
+        likes: 2,
+        dislikes: 2,
+        userLiked: ["test"],
+        userDisliked: ["test"],
+    });
+    product
+        .save()
+        .then((res) => console.log("product saved", res))
+        .catch(console.error);
 }
 
-function handleToken(err, decoded, res) {
-    if (err) res.status(403).send({ message: "Token invalie" + err });
-    else {
-        console.log("le token est valide", decoded);
-        res.send({ message: [{ sauce: "sauce1" }, { sauce: "sauce2" }] });
-    }
-}
-
-module.exports = { getSauces };
+module.exports = { getSauces, createSauce };
