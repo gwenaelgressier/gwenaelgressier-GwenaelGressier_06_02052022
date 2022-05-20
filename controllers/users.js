@@ -65,5 +65,5 @@ function createToken(email) {
     });
 }
 
-//User.deleteMany({}).then(() => console.log("all removed"));//clear toute ma base de données
+//User.deleteMany({}).then(() => console.log("all removed")); //clear toute ma base de données
 module.exports = { createUser, logUser }; //exporte de mes functions

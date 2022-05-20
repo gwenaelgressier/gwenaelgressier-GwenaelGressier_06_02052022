@@ -3,47 +3,69 @@ const { handle } = require("express/lib/router");
 const mongoose = require("mongoose");
 
 const producSchema = new mongoose.Schema({
-    userId: String,
-    name: String,
-    manufacturer: String,
-    description: String,
-    mainPepper: String,
+    userId: { String },
+    name: { String },
+    manufacturer: { String },
+    description: { String },
+    mainPepper: { String },
     imageUrl: String,
-    heat: Number,
-    likes: Number,
-    dislikes: Number,
-    userLiked: [String],
-    userDisliked: [String],
+    heat: { type: Number, min: 1, max: 10 },
+    likes: { Number },
+    dislikes: { Number },
+    usersLiked: [String],
+    usersDisliked: [String],
 });
 
-const Product = mongoose.model("product", producSchema);
+const Product = mongoose.model("Product", producSchema);
 
 function getSauces(req, res) {
-    console.log("test");
-    Product.find({}).then((products) => res.send(products));
+    Product.find({})
+        .then((products) => res.send(products))
+        .catch((error) => res.status(500).send(error));
 }
+
+function getSaucesById(req, res) {
+    const { _id } = req.params.id;
+    console.log("id", _id);
+    Product.findById(_id)
+        .then((product) => res.send(product))
+        .catch((err) => res.status(500).send(err));
+}
+
 //creation de la sauce
 function createSauce(req, res) {
-    const name = req.body.name;
-    const manufacturer = req.body.manufacturer;
-    console.log({ body: req.body });
+    const { body, file } = req;
+
+    const { filename } = file;
+
+    const sauce = JSON.parse(body.sauce);
+
+    const { name, manufacturer, description, mainPepper, heat, userId } = sauce;
+
+    function makeImageUrl(req, filename) {
+        return req.protocol + "://" + req.get("host") + "/images/" + filename;
+    }
+
     const product = new Product({
-        userId: "test",
-        name: "test",
-        manufacturer: "test",
-        description: "test",
-        mainPepper: "test",
-        imageUrl: "test",
-        heat: 2,
-        likes: 2,
-        dislikes: 2,
-        userLiked: ["test"],
-        userDisliked: ["test"],
+        userId,
+        name,
+        manufacturer,
+        description,
+        mainPepper,
+        imageUrl: makeImageUrl(req, filename),
+        heat,
+        likes: 0,
+        dislikes: 0,
+        usersLiked: [],
+        usersDisliked: [],
     });
     product
         .save()
-        .then((res) => console.log("product saved", res))
+        .then((message) => {
+            res.status(201).send({ message: message });
+            return console.log("product enregistré", message);
+        })
         .catch(console.error);
 }
 
-module.exports = { getSauces, createSauce };
+module.exports = { getSauces, createSauce, getSaucesById };
