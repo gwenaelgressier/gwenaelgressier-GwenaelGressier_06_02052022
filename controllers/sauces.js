@@ -1,17 +1,16 @@
 //mes require
-const { handle } = require("express/lib/router");
 const mongoose = require("mongoose");
 
 const producSchema = new mongoose.Schema({
-    userId: { String },
-    name: { String },
-    manufacturer: { String },
-    description: { String },
+    userId: { type: String },
+    name: { type: String },
+    manufacturer: { type: String },
+    description: { type: String },
     mainPepper: { String },
     imageUrl: String,
     heat: { type: Number, min: 1, max: 10 },
-    likes: { Number },
-    dislikes: { Number },
+    likes: { type: Number },
+    dislikes: { type: Number },
     usersLiked: [String],
     usersDisliked: [String],
 });
@@ -25,7 +24,7 @@ function getSauces(req, res) {
 }
 
 function getSaucesById(req, res) {
-    const { _id } = req.params.id;
+    const _id = req.params.id;
     console.log("id", _id);
     Product.findById(_id)
         .then((product) => res.send(product))
