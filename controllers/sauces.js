@@ -1,6 +1,6 @@
 //mes require
 const mongoose = require("mongoose");
-const { unlink } = require("fs/promises");
+const { unlink } = require("fs").promises; //unlink renvoie une promesse
 
 const producSchema = new mongoose.Schema({
     userId: { type: String },
@@ -25,7 +25,7 @@ function getSauces(req, res) {
 }
 
 function getSaucesById(req, res) {
-    const id = req.params.id;
+    const { id } = req.params;
     console.log("id", id);
     Product.findById(id)
         .then((product) => res.send(product))
@@ -35,21 +35,17 @@ function getSaucesById(req, res) {
 function deleteSauces(req, res) {
     const { id } = req.params;
     Product.findByIdAndDelete(id)
-        .then((product) => deleteImage(product))
-        .then((product) => res.send(product))
+        .then(deleteImage)
+        .then((product) => res.send({ message: product }))
         .catch((err) => res.status(500).send({ message: err }));
 }
 
 function deleteImage(product) {
-    const imageUrl = product.imageUrl;
+    const { imageUrl } = product;
     console.log(imageUrl);
     const imageToDelete = `images/${imageUrl.split("/").at(-1)}`;
     console.log(imageToDelete);
-    unlink(imageToDelete, (err) => {
-        if (err) {
-            console.log(err);
-        }
-    });
+    return unlink(imageToDelete).then(() => product);
 }
 
 //creation de la sauce
