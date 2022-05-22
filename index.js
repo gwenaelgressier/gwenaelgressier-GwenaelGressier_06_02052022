@@ -11,6 +11,7 @@ const {
     getSauces,
     createSauce,
     getSaucesById,
+    deleteSauces,
 } = require("./controllers/sauces.js");
 
 //middleware
@@ -23,6 +24,7 @@ app.post("/api/auth/login", logUser);
 app.get("/api/sauces", authenticateUser, getSauces);
 app.post("/api/sauces", authenticateUser, upload.single("image"), createSauce);
 app.get("/api/sauces/:id", authenticateUser, getSaucesById); //passer le params dans le id
+app.delete("/api/sauces/:id", authenticateUser, deleteSauces);
 app.get("/", (req, res) => {
     res.send("Hello World!");
 });

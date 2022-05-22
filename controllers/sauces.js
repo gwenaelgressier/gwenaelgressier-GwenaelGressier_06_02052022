@@ -1,5 +1,6 @@
 //mes require
 const mongoose = require("mongoose");
+const { unlink } = require("fs/promises");
 
 const producSchema = new mongoose.Schema({
     userId: { type: String },
@@ -24,11 +25,31 @@ function getSauces(req, res) {
 }
 
 function getSaucesById(req, res) {
-    const _id = req.params.id;
-    console.log("id", _id);
-    Product.findById(_id)
+    const id = req.params.id;
+    console.log("id", id);
+    Product.findById(id)
         .then((product) => res.send(product))
         .catch((err) => res.status(500).send(err));
+}
+
+function deleteSauces(req, res) {
+    const { id } = req.params;
+    Product.findByIdAndDelete(id)
+        .then((product) => deleteImage(product))
+        .then((product) => res.send(product))
+        .catch((err) => res.status(500).send({ message: err }));
+}
+
+function deleteImage(product) {
+    const imageUrl = product.imageUrl;
+    console.log(imageUrl);
+    const imageToDelete = `images/${imageUrl.split("/").at(-1)}`;
+    console.log(imageToDelete);
+    unlink(imageToDelete, (err) => {
+        if (err) {
+            console.log(err);
+        }
+    });
 }
 
 //creation de la sauce
@@ -67,4 +88,4 @@ function createSauce(req, res) {
         .catch(console.error);
 }
 
-module.exports = { getSauces, createSauce, getSaucesById };
+module.exports = { getSauces, createSauce, getSaucesById, deleteSauces };
