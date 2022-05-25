@@ -1,30 +1,19 @@
 const { app, express } = require("./server");
+const { saucesRouter } = require("./routers/sauces.router");
+const { authRouter } = require("./routers/auth.router");
 const port = 3000;
 const path = require("path");
+const bodyParser = require("body-parser");
 
 //conection to database
 require("./mongo");
 
-//controllerss
-const { createUser, logUser } = require("./controllers/users.js");
-const {
-    getSauces,
-    createSauce,
-    getSaucesById,
-    deleteSauces,
-} = require("./controllers/sauces.js");
-
 //middleware
-const { upload } = require("./middleware/multer");
-const { authenticateUser } = require("./middleware/auth.js");
+app.use(bodyParser.json());
+app.use("/api/sauces", saucesRouter);
+app.use("/api/auth", authRouter);
 
 //Routes
-app.post("/api/auth/signup", createUser);
-app.post("/api/auth/login", logUser);
-app.get("/api/sauces", authenticateUser, getSauces);
-app.post("/api/sauces", authenticateUser, upload.single("image"), createSauce);
-app.get("/api/sauces/:id", authenticateUser, getSaucesById); //passer le params dans le id
-app.delete("/api/sauces/:id", authenticateUser, deleteSauces);
 app.get("/", (req, res) => {
     res.send("Hello World!");
 });
