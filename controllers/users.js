@@ -1,7 +1,13 @@
 const { User } = require("../mongo");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+/**
+ * creation d'un utilisateur
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns {Promise<void>}
+ */
 async function createUser(req, res) {
     try {
         const { email, password } = req.body;
@@ -14,11 +20,24 @@ async function createUser(req, res) {
     }
 }
 
+/**
+ *  cryptage du mot de passe    
+ * 
+ * @param {*} password 
+ * @returns le mot de passe crypté
+ */
 function hashPassword(password) {
     const saltRounds = 10;
     return bcrypt.hash(password, saltRounds);
 }
 
+/**
+ * fonction de connexion qui renvoie un token
+ * 
+ * @param {*} req   
+ * @param {*} res
+ * @returns {Promise<void>}
+ */
 async function logUser(req, res) {
     try {
         const email = req.body.email;
@@ -37,6 +56,12 @@ async function logUser(req, res) {
     }
 }
 
+/**
+ * création du token et expiration de 24H
+ * 
+ * @param {*} email 
+ * @returns le token cree avec une expiration de 24h
+ */
 function createToken(email) {
     const jwtPassword = process.env.JWT_PASSWORD;
     return jwt.sign({ email: email }, jwtPassword, { expiresIn: "24h" });

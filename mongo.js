@@ -4,6 +4,8 @@ const paswords = process.env.DB_PASSWORDS; //se conecter à la base de données 
 const userName = process.env.DB_USERNAME;
 const db = process.env.DB_NAME;
 let uri;
+
+//sert a gerer mon projet dans ses diferente phase actuellement le projet et en developement donc nous seront dans le cas du else
 if (process.env.NODE_ENV === "production") {
     uri = "http://la_vraie_url_de_mongo";
 } else {
