@@ -8,12 +8,10 @@ const {
     likeSauce,
 } = require("../controllers/sauces");
 
+const saucesRouter = express.Router();
 const { authenticateUser } = require("../middleware/auth");
 const { upload } = require("../middleware/multer");
-const saucesRouter = express.Router();
-const bodyParser = require("body-parser");
 
-saucesRouter.use(bodyParser.json());
 saucesRouter.use(authenticateUser);
 
 saucesRouter.get("/", getSauces);

@@ -1,5 +1,13 @@
 const jwt = require("jsonwebtoken");
 
+/**
+ * function qui permet la verification des token
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
+ */
 function authenticateUser(req, res, next) {
     console.log("authenticate user");
     const header = req.header("Authorization");
@@ -12,7 +20,7 @@ function authenticateUser(req, res, next) {
     jwt.verify(token, process.env.JWT_PASSWORD, (err, decoded) => {
         if (err)
             return res.status(403).send({ message: "Token invalid " + err });
-        console.log("Le token est bien valide, on continue");
+        console.log("the token is valid, we continue");
         next();
     });
 }

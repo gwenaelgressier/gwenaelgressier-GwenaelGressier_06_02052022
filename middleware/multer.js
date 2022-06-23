@@ -7,6 +7,13 @@ const storage = multer.diskStorage({
     },
 });
 
+/**
+ * function qui permet cree le nommage unique de l'image
+ *
+ * @param {*} req
+ * @param {*} file
+ * @returns
+ */
 function makeFilename(req, file) {
     console.log("req, file:", file);
     const fileName = `${Date.now()}-${file.originalname}`.replace(/\s/g, "-");

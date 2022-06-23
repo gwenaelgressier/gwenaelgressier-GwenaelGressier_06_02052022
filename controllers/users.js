@@ -3,9 +3,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 /**
  * creation d'un utilisateur
- * 
- * @param {*} req 
- * @param {*} res 
+ *
+ * @param {*} req
+ * @param {*} res
  * @returns {Promise<void>}
  */
 async function createUser(req, res) {
@@ -14,16 +14,16 @@ async function createUser(req, res) {
         const hashedPassword = await hashPassword(password);
         const user = new User({ email, password: hashedPassword });
         await user.save();
-        res.status(201).send({ message: "Utilisateur enregistré !" });
+        res.status(201).send({ message: "Registered user !" });
     } catch (err) {
-        res.status(409).send({ message: "User pas enregistré :" + err });
+        res.status(409).send({ message: "not registered user :" + err });
     }
 }
 
 /**
- *  cryptage du mot de passe    
- * 
- * @param {*} password 
+ *  cryptage du mot de passe
+ *
+ * @param {*} password
  * @returns le mot de passe crypté
  */
 function hashPassword(password) {
@@ -33,8 +33,8 @@ function hashPassword(password) {
 
 /**
  * fonction de connexion qui renvoie un token
- * 
- * @param {*} req   
+ *
+ * @param {*} req
  * @param {*} res
  * @returns {Promise<void>}
  */
@@ -46,20 +46,20 @@ async function logUser(req, res) {
 
         const isPasswordOK = await bcrypt.compare(password, user.password);
         if (!isPasswordOK) {
-            res.status(403).send({ message: "Mot de passe incorrect" });
+            return res.status(403).send({ message: "invalide password" });
         }
         const token = createToken(email);
         res.status(200).send({ userId: user?._id, token: token });
     } catch (err) {
         console.error(err);
-        res.status(500).send({ message: "Erreur interne" });
+        res.status(500).send({ message: "Error" });
     }
 }
 
 /**
  * création du token et expiration de 24H
- * 
- * @param {*} email 
+ *
+ * @param {*} email
  * @returns le token cree avec une expiration de 24h
  */
 function createToken(email) {
