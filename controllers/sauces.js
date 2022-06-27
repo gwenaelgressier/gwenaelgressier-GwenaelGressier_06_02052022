@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 const { unlink } = require("fs/promises");
+const jwt = require("jsonwebtoken");
+//on inclut le module FyleSystem qui permet de travailler avec les fichiers
+const fs = require("fs");
 
 const productSchema = new mongoose.Schema({
     userId: String,
@@ -59,12 +62,33 @@ function getSauceById(req, res) {
  * @param {*} res
  */
 function deleteSauce(req, res) {
-    const { id } = req.params;
-    Product.findByIdAndDelete(id)
-        .then((product) => sendClientResponse(product, res))
-        .then((item) => deleteImage(item))
-        .then((res) => console.log("FILE DELETED", res))
-        .catch((err) => res.status(500).send({ message: err }));
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_PASSWORD);
+    const userId = decodedToken.id;
+    console.log(decodedToken.id);
+
+    Product.findOne({ _id: req.params.id })
+        .then((product) => {
+            console.log(product.userId === userId);
+            //si userId est le meme que celui qui a créé la sauce
+            if (product.userId === userId) {
+                const imageToDelete = product.imageUrl.split("/");
+                let img = imageToDelete.slice(-1).pop();
+                fs.unlink(`images/${img}`, () => {
+                    Product.deleteOne({ _id: req.params.id })
+                        .then(() =>
+                            res
+                                .status(200)
+                                .json({ message: "Sauce supprimé !" })
+                        )
+                        .catch((error) => res.status(400).json({ error }));
+                });
+            } else {
+                //si userId different
+                res.status(403).json({ message: "Requête non autorisée !" });
+            }
+        })
+        .catch((error) => res.status(500).json({ error }));
 }
 
 /**
@@ -79,7 +103,6 @@ function modifySauce(req, res) {
 
     const hasNewImage = req.file != null;
     const payload = makePayload(hasNewImage, req);
-
     Product.findByIdAndUpdate(id, payload)
         .then((dbResponse) => sendClientResponse(dbResponse, res))
         .then((product) => {

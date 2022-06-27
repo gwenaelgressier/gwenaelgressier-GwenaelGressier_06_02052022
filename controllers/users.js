@@ -1,6 +1,7 @@
 const { User } = require("../mongo");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+let userId;
 /**
  * creation d'un utilisateur
  *
@@ -48,8 +49,9 @@ async function logUser(req, res) {
         if (!isPasswordOK) {
             return res.status(403).send({ message: "invalide password" });
         }
-        const token = createToken(email);
-        res.status(200).send({ userId: user?._id, token: token });
+        userId = user?._id;
+        const token = createToken(email, userId);
+        res.status(200).send({ userId, token: token });
     } catch (err) {
         console.error(err);
         res.status(500).send({ message: "Error" });
@@ -64,7 +66,9 @@ async function logUser(req, res) {
  */
 function createToken(email) {
     const jwtPassword = process.env.JWT_PASSWORD;
-    return jwt.sign({ email: email }, jwtPassword, { expiresIn: "24h" });
+    return jwt.sign({ email: email, id: userId }, jwtPassword, {
+        expiresIn: "24h",
+    });
 }
 
 module.exports = { createUser, logUser };
